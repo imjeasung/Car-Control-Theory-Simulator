@@ -114,6 +114,7 @@ npx serve
 ---
 
 ## 🎨 스크린샷
+![image](https://github.com/user-attachments/assets/303c2876-0354-445d-bdb5-fcaf846a4b81)
 
 ```
 🚗 차량이 트랙을 따라 움직이며...
