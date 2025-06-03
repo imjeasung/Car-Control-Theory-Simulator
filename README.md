@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Car Control Simulator](https://img.shields.io/badge/F1-Control%20Simulator-red?style=for-the-badge&logo=formula1)
+![Car Control Simulator](https://img.shields.io/badge/Car-Control%20Simulator-red?style=for-the-badge&logo=formula1)
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![Canvas](https://img.shields.io/badge/HTML5%20Canvas-orange?style=for-the-badge&logo=html5&logoColor=white)
