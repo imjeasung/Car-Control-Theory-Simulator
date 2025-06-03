@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자동차 제어 시뮬레이터 - Enhanced</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <h1>🏎️ 자동차 제어 시뮬레이터</h1>
+        <p>PID 제어 알고리즘을 시각적으로 학습해보세요 - 성능 메트릭 & 궤적 히스토리 지원</p>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <main class="container">
+        <!-- 제어 설정 패널 (왼쪽) -->
+        <aside class="control-panel">
+            <h2>🎛️ 제어 설정</h2>
+            
+            <!-- 제어기 선택 -->
+            <div class="control-group">
+                <label for="controllerType">제어기 타입:</label>
+                <select id="controllerType">
+                    <option value="manual">수동 제어</option>
+                    <option value="onoff">ON/OFF 제어</option>
+                    <option value="p">P 제어</option>
+                    <option value="pi">PI 제어</option>
+                    <option value="pd">PD 제어</option>
+                    <option value="pid">PID 제어</option>
+                    <option value="mpc">MPC 제어</option>
+                </select>
+            </div>
+
+            <!-- 파라미터 조정 -->
+            <div class="parameters" id="parameters">
+                <!-- 제어기별로 동적 생성 -->
+            </div>
+
+            <!-- 시뮬레이션 제어 -->
+            <div class="simulation-controls">
+                <button id="startBtn" class="btn btn-primary">▶️ 시작</button>
+                <button id="pauseBtn" class="btn btn-secondary">⏸️ 일시정지</button>
+                <button id="resetBtn" class="btn btn-danger">🔄 리셋</button>
+            </div>
+
+            <!-- 속도 조절 -->
+            <div class="control-group">
+                <label for="speedSlider">시뮬레이션 속도: <span id="speedValue">1.0x</span></label>
+                <input type="range" id="speedSlider" min="0.1" max="3.0" step="0.1" value="1.0">
+            </div>
+
+            <!-- 고급 기능 토글 -->
+            <div class="feature-toggles">
+                <h3>📊 고급 기능</h3>
+                
+                <div class="toggle-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="trajectoryToggle" checked>
+                        <span>🛤️ 궤적 히스토리 표시</span>
+                    </label>
+                </div>
+                
+                <div class="toggle-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="metricsToggle" checked>
+                        <span>📈 성능 메트릭 표시</span>
+                    </label>
+                </div>
+
+                <div class="shortcut-info">
+                    <small>단축키: T(궤적토글) | C(궤적삭제) | D(디버그)</small>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 시뮬레이션 영역 (가운데) -->
+        <section class="simulation-area">
+            <canvas id="trackCanvas" width="720" height="540"></canvas>
+            
+            <!-- 기본 정보 패널 -->
+            <div class="info-panel">
+                <div class="info-item">
+                    <span class="label">오차:</span>
+                    <span id="errorValue" class="value">0.0</span>
+                    <span class="unit">px</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">제어 출력:</span>
+                    <span id="controlOutput" class="value">0.0</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">속도:</span>
+                    <span id="vehicleSpeed" class="value">0</span>
+                    <span class="unit">px/s</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">시간:</span>
+                    <span id="timeElapsed" class="value">0.0</span>
+                    <span class="unit">s</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">FPS:</span>
+                    <span id="fpsCounter" class="value">60</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 성능 메트릭 패널 (오른쪽) -->
+        <aside class="metrics-panel" id="metricsPanel">
+            <h2>📊 제어 성능 메트릭</h2>
+            
+            <div class="metrics-grid">
+                <div class="metric-item primary">
+                    <span class="metric-label">종합 성능 점수</span>
+                    <span id="performanceScore" class="metric-value large">0/100</span>
+                </div>
+                
+                <div class="metric-item">
+                    <span class="metric-label">오버슈트</span>
+                    <span id="overshootValue" class="metric-value">0.0%</span>
+                </div>
+                
+                <div class="metric-item">
+                    <span class="metric-label">정착시간</span>
+                    <span id="settlingTimeValue" class="metric-value">0.0s</span>
+                </div>
+                
+                <div class="metric-item">
+                    <span class="metric-label">정상상태오차</span>
+                    <span id="steadyStateErrorValue" class="metric-value">0.0px</span>
+                </div>
+                
+                <div class="metric-item">
+                    <span class="metric-label">RMS 오차</span>
+                    <span id="mseValue" class="metric-value">0.0</span>
+                </div>
+                
+                <div class="metric-item">
+                    <span class="metric-label">IAE</span>
+                    <span id="iaeValue" class="metric-value">0.0</span>
+                </div>
+            </div>
+
+            <div class="metrics-info">
+                <small>
+                    💡 <strong>성능 분석:</strong><br>
+                    • 오버슈트: 목표 대비 초과량<br>
+                    • 정착시간: 안정화까지 소요시간<br>
+                    • 정상상태오차: 최종 추종 오차<br>
+                    • RMS: 전체 오차의 크기<br>
+                    • IAE: 누적 절대 오차
+                </small>
+            </div>
+
+            <div class="performance-tips">
+                <h4>🎯 성능 개선 가이드</h4>
+                <div class="tip-item">
+                    <strong>90점 이상:</strong> 최우수 제어 성능 🏆
+                </div>
+                <div class="tip-item">
+                    <strong>70-89점:</strong> 우수한 제어 성능 ⭐
+                </div>
+                <div class="tip-item">
+                    <strong>50-69점:</strong> 보통, 개선 여지 있음 📈
+                </div>
+                <div class="tip-item">
+                    <strong>50점 미만:</strong> 파라미터 재조정 필요 🔧
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- 하단 설명 -->
+    <footer class="footer">
+        <div class="explanation">
+            <h3>💡 제어기별 특징 & 성능 메트릭 해석</h3>
+            <div class="controller-explanations">
+                <div class="explanation-item">
+                    <strong>ON/OFF:</strong> 임계값 기준으로 최대 조향. 지그재그 움직임. 
+                    큰 오버슈트와 긴 정착시간이 특징.
+                </div>
+                <div class="explanation-item">
+                    <strong>P 제어:</strong> 오차에 비례한 부드러운 제어. 정상상태 오차 존재.
+                    적당한 오버슈트, 빠른 응답.
+                </div>
+                <div class="explanation-item">
+                    <strong>PI 제어:</strong> 정상상태 오차 제거. 오버슈트 가능성.
+                    완벽한 추종성능, 약간의 진동.
+                </div>
+                <div class="explanation-item">
+                    <strong>PD 제어:</strong> 빠른 응답, 오버슈트 감소. 정상상태 오차 존재.
+                    안정적이지만 잔류 오차.
+                </div>
+                <div class="explanation-item">
+                    <strong>PID 제어:</strong> 종합적 성능. 적절한 튜닝 필요.
+                    이론적으로 최고 성능, 파라미터 민감.
+                </div>
+                <div class="explanation-item">
+                    <strong>성능 메트릭:</strong> 
+                    오버슈트(%), 정착시간(s), 정상상태오차(px), 
+                    RMS 오차, IAE(절대오차적분)로 객관적 성능 평가.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript 파일들 -->
+    <script src="js/utils.js"></script>
+    <script src="js/track.js"></script>
+    <script src="js/vehicle.js"></script>
+    <script src="js/controllers.js"></script>
+    <script src="js/mpc_controller.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
