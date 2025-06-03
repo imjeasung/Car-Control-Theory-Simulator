@@ -168,6 +168,6 @@ npx serve
 
 **⭐ 이 프로젝트가 도움이 되었다면 스타를 눌러주세요! ⭐**
 
-![Star this repo](https://img.shields.io/github/stars/yourusername/F1-Control-Theory-Simulator?style=social)
+![Star this repo](https://img.shields.io/github/stars/imjeasung/Car-Control-Theory-Simulator?style=social)
 
 </div>
