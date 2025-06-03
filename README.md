@@ -55,7 +55,7 @@
 git clone https://github.com/imjeasung/Car-Control-Theory-Simulator.git
 
 # 폴더 이동
-cd F1-Control-Theory-Simulator
+cd Car-Control-Theory-Simulator
 
 # 웹 서버 실행 (선택사항)
 python -m http.server 8000
